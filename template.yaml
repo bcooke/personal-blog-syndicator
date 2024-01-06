@@ -1,128 +1,55 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  personal-blog-syndicator
 
-  Sample SAM Template for personal-blog-syndicator
 Resources:
-  SfnToStockCheckerFunctionConnector:
-    Type: AWS::Serverless::Connector # More info about Connector Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-connector.html
+  RssFeedCheckerFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      Source:
-        Id: StockTradingStateMachine
-      Destination:
-        Id: StockCheckerFunction
-      Permissions:
-      - Write
-
-  SfnToStockBuyerFunctionConnector:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: StockTradingStateMachine
-      Destination:
-        Id: StockBuyerFunction
-      Permissions:
-      - Write
-
-  SfnToStockSellerFunctionConnector:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: StockTradingStateMachine
-      Destination:
-        Id: StockSellerFunction
-      Permissions:
-      - Write
-
-  SfnToTransactionTableConnector:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: StockTradingStateMachine
-      Destination:
-        Id: TransactionTable
-      Permissions:
-      - Write
-
-  StockTradingStateMachine:
-    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
-    Properties:
-      DefinitionUri: statemachine/stock_trader.asl.json
-      DefinitionSubstitutions:
-        StockCheckerFunctionArn: !GetAtt StockCheckerFunction.Arn
-        StockSellerFunctionArn: !GetAtt StockSellerFunction.Arn
-        StockBuyerFunctionArn: !GetAtt StockBuyerFunction.Arn
-        DDBPutItem: !Sub arn:${AWS::Partition}:states:::dynamodb:putItem
-        DDBTable: !Ref TransactionTable
+      Description: A Lambda function checks for whether there are new posts in the RSS feed
+      CodeUri: functions/rss_feed_checker/
+      Handler: app.lambda_handler
+      Runtime: python3.9
       Events:
-        HourlyTradingSchedule:
-          Type: Schedule # More info about Schedule Event Source: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-schedule.html
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 10 * * ? *)
+
+  LinkedInPosterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: A Lambda function takes a blog URL and posts it to LinkedIn
+      CodeUri: functions/linkedin_poster/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+
+  TwitterPosterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: A Lambda function takes a blog URL and posts it to Twitter
+      CodeUri: functions/twitter_poster/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+
+  BlogSyndicatorStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/blog_syndicator.asl.json
+      DefinitionSubstitutions:
+        RssFeedCheckerFunctionArn: !GetAtt RssFeedCheckerFunction.Arn
+        LinkedInPosterFunctionArn: !GetAtt LinkedInPosterFunction.Arn
+        TwitterPosterFunctionArn: !GetAtt TwitterPosterFunction.Arn
+      Events:
+        PublishingSchedule:
+          Type: Schedule
           Properties:
             Description: Schedule to run the stock trading state machine every hour
-            Enabled: false # This schedule is disabled by default to avoid incurring charges.
-            Schedule: rate(1 hour)
+            Enabled: false
+            Schedule: cron(*/10 * * * ? *)
       Policies:
-      - CloudWatchPutMetricPolicy: {}
-
-  StockCheckerFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
-    Properties:
-      CodeUri: functions/stock_checker/
-      Handler: app.lambda_handler
-      Runtime: python3.10
-
-  StockSellerFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: functions/stock_seller/
-      Handler: app.lambda_handler
-      Runtime: python3.10
-
-  StockBuyerFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: functions/stock_buyer/
-      Handler: app.lambda_handler
-      Runtime: python3.10
-
-  TransactionTable:
-    Type: AWS::Serverless::SimpleTable # More info about SimpleTable Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-simpletable.html
-    Properties:
-      PrimaryKey:
-        Name: Id
-        Type: String
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-
-  ApplicationResourceGroup:
-    Type: AWS::ResourceGroups::Group
-    Properties:
-      Name:
-        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
-      ResourceQuery:
-        Type: CLOUDFORMATION_STACK_1_0
-  ApplicationInsightsMonitoring:
-    Type: AWS::ApplicationInsights::Application
-    Properties:
-      ResourceGroupName:
-        Ref: ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
-Outputs:
-  # StockTradingStateMachineHourlyTradingSchedule is an implicit Schedule event rule created out of Events key under Serverless::StateMachine
-  # Find out more about other implicit resources you can reference within SAM
-  # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources.html
-  StockTradingStateMachineArn:
-    Description: Stock Trading State machine ARN
-    Value: !Ref StockTradingStateMachine
-  StockTradingStateMachineRoleArn:
-    Description: IAM Role created for Stock Trading State machine based on the specified
-      SAM Policy Templates
-    Value: !GetAtt StockTradingStateMachineRole.Arn
-# # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-Globals:
-  Function:
-    Tracing: Active
-  Api:
-    TracingEnabled: true
+      - LambdaInvokePolicy:
+          FunctionName: !Ref RssFeedCheckerFunction
+      - LambdaInvokePolicy:
+          FunctionName: !Ref LinkedInPosterFunction
+      - LambdaInvokePolicy:
+          FunctionName: !Ref TwitterPosterFunction

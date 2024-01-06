@@ -1,0 +1,52 @@
+{
+  "Comment": "A workflow to check RSS feed and post to social media",
+  "StartAt": "Check RSS Feed",
+  "States": {
+    "Check RSS Feed": {
+      "Type": "Task",
+      "Resource": "${RssCheckerFunctionArn}",
+      "Next": "Check If New Post Exists"
+    },
+    "Check If New Post Exists": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.newPost",
+          "BooleanEquals": true,
+          "Next": "Post To Social Media"
+        }
+      ],
+      "Default": "End"
+    },
+    "Post To Social Media": {
+      "Type": "Parallel",
+      "Next": "End",
+      "Branches": [
+        {
+          "StartAt": "Post To LinkedIn",
+          "States": {
+            "Post To LinkedIn": {
+              "Type": "Task",
+              "Resource": "${LinkedInPosterFunctionArn}",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Post To Twitter",
+          "States": {
+            "Post To Twitter": {
+              "Type": "Task",
+              "Resource": "${TwitterPosterFunctionArn}",
+              "End": true
+            }
+          }
+        }
+      ]
+    },
+    "End": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}
