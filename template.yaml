@@ -9,11 +9,6 @@ Resources:
       CodeUri: functions/rss_feed_checker/
       Handler: app.lambda_handler
       Runtime: python3.9
-      Events:
-        Schedule:
-          Type: Schedule
-          Properties:
-            Schedule: cron(0 10 * * ? *)
 
   LinkedInPosterFunction:
     Type: AWS::Serverless::Function
