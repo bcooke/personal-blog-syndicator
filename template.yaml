@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+  LinkedInSecretArn:
+    Type: String
+    Description: The ARN of the secret containing the LinkedIn credentials
+
 Resources:
   RssFeedCheckerFunction:
     Type: AWS::Serverless::Function
@@ -17,7 +22,13 @@ Resources:
       CodeUri: functions/linkedin_poster/
       Handler: app.lambda_handler
       Runtime: python3.9
-
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref LinkedInSecretArn
+      Environment:
+        Variables:
+          LINKED_IN_SECRET_ARN: !Ref LinkedInSecretArn
+      
   TwitterPosterFunction:
     Type: AWS::Serverless::Function
     Properties:

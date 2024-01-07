@@ -1,0 +1,2 @@
+linkedin-api-client
+urllib3<2

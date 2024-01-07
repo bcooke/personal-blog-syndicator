@@ -5,13 +5,14 @@
     "Check RSS Feed": {
       "Type": "Task",
       "Resource": "${RssCheckerFunctionArn}",
+      "ResultPath": "$.RssCheckerFunctionOutput",
       "Next": "Check If New Post Exists"
     },
     "Check If New Post Exists": {
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.newPost",
+          "Variable": "$.RssCheckerFunctionOutput.body.url",
           "BooleanEquals": true,
           "Next": "Post To Social Media"
         }
@@ -28,6 +29,7 @@
             "Post To LinkedIn": {
               "Type": "Task",
               "Resource": "${LinkedInPosterFunctionArn}",
+              "InputPath": "$.RssCheckerFunctionOutput.body.url",
               "End": true
             }
           }
@@ -38,6 +40,7 @@
             "Post To Twitter": {
               "Type": "Task",
               "Resource": "${TwitterPosterFunctionArn}",
+              "InputPath": "$.RssCheckerFunctionOutput.body.url",
               "End": true
             }
           }

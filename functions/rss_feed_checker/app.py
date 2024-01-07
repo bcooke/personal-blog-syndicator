@@ -1,11 +1,16 @@
-import feedparser
+import json
 from datetime import datetime, timedelta
+import feedparser
 
 
 RSS_FEED_URL = "https://www.brettcooke.io/rss.xml"
 
 def lambda_handler(event, context):
-    return check_rss_feed(RSS_FEED_URL)
+    blog_url = check_rss_feed(RSS_FEED_URL)
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'url': blog_url})
+    }
 
 def check_rss_feed(url):
     """
@@ -29,7 +34,8 @@ def check_rss_feed(url):
         published_time = datetime(*entry.published_parsed[:6])
 
         # Check if the post is within the last 24 hours
-        if current_time - published_time < timedelta(days=1):
+        # if current_time - published_time < timedelta(days=1):
+        if current_time - published_time < timedelta(hours=1):
             return entry.link
 
     return None
