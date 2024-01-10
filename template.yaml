@@ -5,6 +5,18 @@ Parameters:
   LinkedInSecretArn:
     Type: String
     Description: The ARN of the secret containing the LinkedIn credentials
+  TwitterConsumerKeyArn:
+    Type: String
+    Description: The ARN of the Twitter consumer key
+  TwitterConsumerKeySecretArn:
+    Type: String
+    Description: The ARN of the Twitter consumer key secret
+  TwitterAccessTokenArn:
+    Type: String
+    Description: The ARN of the Twitter access token
+  TwitterAccessTokenSecretArn:
+    Type: String
+    Description: The ARN of the Twitter access token secret
 
 Resources:
   RssFeedCheckerFunction:
@@ -36,6 +48,21 @@ Resources:
       CodeUri: functions/twitter_poster/
       Handler: app.lambda_handler
       Runtime: python3.9
+      Policies:
+        - Statement:
+            - Effect: "Allow"
+              Action: "secretsmanager:GetSecretValue"
+              Resource:
+                - !Ref TwitterConsumerKeyArn
+                - !Ref TwitterConsumerKeySecretArn
+                - !Ref TwitterAccessTokenArn
+                - !Ref TwitterAccessTokenSecretArn
+      Environment:
+        Variables:
+          TWITTER_CONSUMER_KEY_ARN: !Ref TwitterConsumerKeyArn
+          TWITTER_CONSUMER_KEY_SECRET_ARN: !Ref TwitterConsumerKeySecretArn
+          TWITTER_ACCESS_TOKEN_ARN: !Ref TwitterAccessTokenArn
+          TWITTER_ACCESS_TOKEN_SECRET_ARN: !Ref TwitterAccessTokenSecretArn
 
   BlogSyndicatorStateMachine:
     Type: AWS::Serverless::StateMachine
