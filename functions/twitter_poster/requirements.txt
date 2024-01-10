@@ -1,1 +1,2 @@
 tweepy
+urllib3<2
