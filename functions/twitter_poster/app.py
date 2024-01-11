@@ -15,10 +15,14 @@ def post_to_twitter(url):
     access_token = get_secret('TWITTER_ACCESS_TOKEN_ARN')
     access_token_secret = get_secret('TWITTER_ACCESS_TOKEN_SECRET_ARN')
 
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_token, access_token_secret)
-    api = tweepy.API(auth)
-    api.update_status("Hello, Twitter!")
+    client = tweepy.Client(
+        consumer_key=consumer_key, consumer_secret=consumer_secret,
+        access_token=access_token, access_token_secret=access_token_secret
+    )
+    response = client.create_tweet(
+        text="This Tweet was Tweeted using Tweepy and Twitter API v2!"
+    )
+    print(f"https://twitter.com/user/status/{response.data['id']}")
 
 
 def get_secret(name):
