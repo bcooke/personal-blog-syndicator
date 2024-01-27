@@ -1,2 +1,4 @@
 tweepy
+requests==2.28.2
+beautifulsoup4
 urllib3<2

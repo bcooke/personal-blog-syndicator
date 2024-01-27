@@ -34,6 +34,7 @@ Resources:
       CodeUri: functions/linkedin_poster/
       Handler: app.lambda_handler
       Runtime: python3.9
+      Timeout: 30
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Ref LinkedInSecretArn
@@ -48,6 +49,7 @@ Resources:
       CodeUri: functions/twitter_poster/
       Handler: app.lambda_handler
       Runtime: python3.9
+      Timeout: 30
       Policies:
         - Statement:
             - Effect: "Allow"
