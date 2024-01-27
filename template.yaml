@@ -78,9 +78,9 @@ Resources:
         PublishingSchedule:
           Type: Schedule
           Properties:
-            Description: Schedule to run the stock trading state machine every hour
-            Enabled: false
-            Schedule: cron(*/10 * * * ? *)
+            Description: Schedule to run the blog syndicator state machine every day at 9:30 AM ET
+            Enabled: true
+            Schedule: cron(30 14 * * ? *)
       Policies:
       - LambdaInvokePolicy:
           FunctionName: !Ref RssFeedCheckerFunction
