@@ -63,7 +63,7 @@ Contributions are welcome! To contribute:
 3. Implement your feature or fix and test it.
 4. Submit a pull request with a comprehensive description of your changes.
 
-## 🤝 Support
+## 🤝 Issues and Suggestions
 If you encounter any issues or have suggestions, feel free to open an issue on the GitHub repository.
 
 ## 🌟 Show Your Support
