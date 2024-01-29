@@ -12,4 +12,4 @@ source .env
 PARAM_OVERRIDES="LinkedInSecretArn=$LINKEDIN_SECRET_ARN TwitterConsumerKeyArn=$TWITTER_CONSUMER_KEY_ARN TwitterConsumerKeySecretArn=$TWITTER_CONSUMER_KEY_SECRET_ARN TwitterAccessTokenArn=$TWITTER_ACCESS_TOKEN_ARN TwitterAccessTokenSecretArn=$TWITTER_ACCESS_TOKEN_SECRET_ARN"
 
 # Run the SAM command
-echo '{"url": "https://www.brettcooke.io/posts/obsidian-is-my-everything-app"}' | sam local invoke --event - "TwitterPosterFunction" --parameter-overrides $PARAM_OVERRIDES
+echo '{"url": "https://www.brettcooke.io/posts/syndicating-this-blog-part-i"}' | sam local invoke --event - "TwitterPosterFunction" --parameter-overrides $PARAM_OVERRIDES

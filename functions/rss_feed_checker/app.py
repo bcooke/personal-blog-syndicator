@@ -34,8 +34,7 @@ def check_rss_feed(url):
         published_time = datetime(*entry.published_parsed[:6])
 
         # Check if the post is within the last 24 hours
-        # if current_time - published_time < timedelta(days=1):
-        if current_time - published_time < timedelta(hours=1):
+        if current_time - published_time < timedelta(days=1):
             return entry.link
 
     return None

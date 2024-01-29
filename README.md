@@ -22,8 +22,8 @@ This AWS SAM application automates the process of syndicating blog posts to Link
 
 1. **Clone the Repository**:
    ```bash
-   git clone [repository-url]
-   cd [repository-name]
+   git clone https://github.com/bcooke/personal-blog-syndicator
+   cd personal-blog-syndicator
    ```
 
 2. **Setup Developer Accounts and Apps:**
