@@ -13,7 +13,7 @@
       "Choices": [
         {
           "Variable": "$.RssFeedCheckerFunctionOutput.body.url",
-          "BooleanEquals": true,
+          "IsNull": false,
           "Next": "Post To Social Media"
         }
       ],
@@ -29,7 +29,7 @@
             "Post To LinkedIn": {
               "Type": "Task",
               "Resource": "${LinkedInPosterFunctionArn}",
-              "InputPath": "$.RssFeedCheckerFunctionOutput.body.url",
+              "InputPath": "$.RssFeedCheckerFunctionOutput.body",
               "End": true
             }
           }
@@ -40,7 +40,7 @@
             "Post To Twitter": {
               "Type": "Task",
               "Resource": "${TwitterPosterFunctionArn}",
-              "InputPath": "$.RssFeedCheckerFunctionOutput.body.url",
+              "InputPath": "$.RssFeedCheckerFunctionOutput.body",
               "End": true
             }
           }

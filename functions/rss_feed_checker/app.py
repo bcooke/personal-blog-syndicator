@@ -9,7 +9,7 @@ def lambda_handler(event, context):
     blog_url = check_rss_feed(RSS_FEED_URL)
     return {
         'statusCode': 200,
-        'body': json.dumps({'url': blog_url})
+        'body': {'url': blog_url}
     }
 
 def check_rss_feed(url):

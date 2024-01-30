@@ -80,7 +80,7 @@ Resources:
           Properties:
             Description: Schedule to run the blog syndicator state machine every day at 9:30 AM ET
             Enabled: true
-            Schedule: cron(30 3 * * ? *)
+            Schedule: cron(30 14 * * ? *)
       Policies:
       - LambdaInvokePolicy:
           FunctionName: !Ref RssFeedCheckerFunction
